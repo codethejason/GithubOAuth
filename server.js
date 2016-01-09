@@ -2,14 +2,32 @@
 var http = require('http');
 var dispatcher = require('httpdispatcher');
 
+var options = {
+  clientID: '7d71da50c080b8899fa5',
+  scope: '',
+  redirectURI: 'http://192.111.152.115:17210/oauth/dashboard'
+};
 //dispatcher routes
 dispatcher.setStatic('resources');
 
-//A sample GET request    
-dispatcher.onGet("/page1", function(req, res) {
-  res.writeHead(200, {'Content-Type': 'text/plain'});
-  res.end('Page One');
+
+//login page 
+dispatcher.onGet("/login", function(req, res) {
+  var state = 'hello';
+  var url = 'https://github.com/login/oauth/authorize'
+  + '?client_id=' + options.clientID
+  + (options.scope ? '&scope=' + options.scope : '')
+  + '&redirect_uri=' + options.redirectURI
+  + '&state=' + state
+  ;
+  res.statusCode = 302
+  res.setHeader('location', url)
+  res.end()
 });    
+
+dispatcher.onGet("/callback", function(req, res) {
+  res.end('hello, this is a callback');
+});
 
 //define port for listening for web server
 const PORT = 8080;
