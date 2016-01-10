@@ -8,7 +8,7 @@ var state = Math.round(Math.random()*10);
 
 var options = {
   clientID: '7d71da50c080b8899fa5',
-  secret: '',
+  secret: '30221ba2c9d3ca955b0d7aa64ff57776dad801a1',
   scope: '',
   redirectURI: 'http://37.187.42.14:8080/callback'
 };
@@ -34,7 +34,7 @@ dispatcher.onGet("/callback", function(req, res) {
   var url_parts = url.parse(req.url, true);
   var query = url_parts.query;
   //returns something like { code: '6cd032d64f7b45f0d339', state: '10' }
-  if(query.state == 10) { //supposed to be if states match
+  if(query.state == state) { //supposed to be if states match
     res.writeHead(200, {'Content-Type': 'text/plain'});
     requestToken(query.code);
   }
@@ -45,18 +45,18 @@ dispatcher.onGet("/callback", function(req, res) {
 
 dispatcher.onGet("/dashboard", function(req, res) {
   res.end("Hello, you made it!");
-}
+});
 
                  
-var requestToken = function (code) {
+function requestToken(code) {
   var arguments = {
     code: code,
     client_id: options.clientID,
     client_secret: options.secret,
-    redirect_uri: 'http://37.187.42.14:8080/oauth/dashboard',
+    redirect_uri: 'http://37.187.42.14:8080/dashboard',
     state: state
   };
-  request.post('https://github.com/login/oauth/access_token', formData: arguments, function (error, response, body) {
+  request.post({url: 'https://github.com/login/oauth/access_token', formData: arguments}, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       res.end(body);
     }
