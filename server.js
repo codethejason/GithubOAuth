@@ -8,7 +8,7 @@ var state = round(Math.random()*10);
 var options = {
   clientID: '7d71da50c080b8899fa5',
   scope: '',
-  redirectURI: 'http://37.187.42.14:8080/oauth/callback'
+  redirectURI: 'http://37.187.42.14:8080/callback'
 };
 //dispatcher routes
 dispatcher.setStatic('resources');
@@ -22,9 +22,9 @@ dispatcher.onGet("/login", function(req, res) {
   + '&redirect_uri=' + options.redirectURI
   + '&state=' + state
   ;
-  res.statusCode = 302
-  res.setHeader('location', url)
-  res.end()
+  res.statusCode = 302;
+  res.setHeader('location', url);
+  res.end();
 });    
 
 dispatcher.onPost("/callback", function(req, res) {
