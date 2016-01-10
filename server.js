@@ -5,7 +5,7 @@ var dispatcher = require('httpdispatcher');
 var options = {
   clientID: '7d71da50c080b8899fa5',
   scope: '',
-  redirectURI: 'http://192.111.152.115:17210/oauth/dashboard'
+  redirectURI: 'http://37.187.42.14:8080/oauth/callback'
 };
 //dispatcher routes
 dispatcher.setStatic('resources');
