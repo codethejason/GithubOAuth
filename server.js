@@ -13,7 +13,6 @@ var options = { //for github api
   
 };
 
-
 var token = '';
 var state = Math.round(Math.random()*10); //not crypto secure; just a model for a stronger encryption option
 
