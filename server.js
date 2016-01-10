@@ -46,7 +46,12 @@ dispatcher.onGet("/callback", function(req, res) {
   if(query.state == state) { //supposed to be if states match
     res.writeHead(200, {'Content-Type': 'text/plain'});
     token = requestToken(query.code);
-    var username = getUsername(token);
+    console.log(token);
+    if(token) { 
+      console.log("H");
+      var username = getUsername(token);
+    };
+    
     res.end();
   }
   else {
@@ -56,22 +61,28 @@ dispatcher.onGet("/callback", function(req, res) {
 
                  
 function requestToken(code) {
+  var fetchedToken = '';
   var arguments = {
     code: code,
     client_id: options.clientID,
-    client_secret: options.secret,
-    state: state
+    client_secret: options.secret
   };
   request.post({url: 'https://github.com/login/oauth/access_token', formData: arguments, headers: {'Accept': 'application/json'}}, function (error, response, body) {
     if (!error && response.statusCode == 200) {
-      var token = JSON.parse(body).access_token;
-      return token;
+      token = JSON.parse(body).access_token;
     }
-})
+  });
+  console.log("Token" + token);
 };
 
-function getUsername() {
-  console.log("Getting username");
+//get authenticated user's username
+function getUsername(token) {
+  console.log(token);
+  request.get({url: 'https://github.com/user', headers: {'Accept': 'application/json'}}, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      console.log(token);
+    }
+  });
 }
 
 //define port for listening for web server
