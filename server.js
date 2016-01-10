@@ -44,41 +44,47 @@ dispatcher.onGet("/callback", function(req, res) {
   var query = url_parts.query;
   //returns something like { code: '6cd032d64f7b45f0d339', state: '10' }
   if(query.state == state) { //supposed to be if states match
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    token = requestToken(query.code);
-    if(true) { 
-      console.log("H");
-      var username = getUsername(token);
+
+    var arguments = {
+      code: query.code,
+      client_id: options.clientID,
+      client_secret: options.secret
     };
+    request.post({url: 'https://github.com/login/oauth/access_token', formData: arguments, headers: {'Accept': 'application/json'}}, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        token = JSON.parse(body).access_token;
+        res.statusCode = 302;
+        res.setHeader('location', 'dashboard');
+        res.end();
+      }
+    });
     
-    res.end();
   }
   else {
     res.end('Sorry, an error occured.');
   }
 });
 
-                 
-function requestToken(code, callback) {
-  var fetchedToken = '';
-  var arguments = {
-    code: code,
-    client_id: options.clientID,
-    client_secret: options.secret
-  };
-  if(request.post({url: 'https://github.com/login/oauth/access_token', formData: arguments, headers: {'Accept': 'application/json'}}, function (error, response, body) {
+//members page
+dispatcher.onGet("/dashboard", function(req, res) {
+  request.get({url: "https://api.github.com/user", headers: {'Authorization': 'token '+token, 'User-Agent': 'Mozilla 5.0'}}, function(error, response, body) {
     if (!error && response.statusCode == 200) {
-      fetchedToken = JSON.parse(body).access_token;
+      body = JSON.parse(body);
+      var user = body.login;
+      var data = "<!DOCTYPE html><html><body><h1>Dashboard</h1>Welcome to your dashboard, "+user+"!</body></html>";
+      res.write(data);
+      res.end();
+    } else {
+      console.log(body);
     }
-  })) {
-    callback(fetchedToken);
-  }
-};
+  });
+});
+
 
 //get authenticated user's username
 function getUsername(token) {
   console.log(token);
-  request.get({url: 'https://github.com/user', headers: {'Accept': 'application/json'}}, function (error, response, body) {
+  request.get({url: 'https://api.github.com/user', headers: {'Authorization': 'token '+token}}, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       console.log(token);
     }
