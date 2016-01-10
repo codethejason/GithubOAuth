@@ -4,24 +4,25 @@ var dispatcher = require('httpdispatcher');
 var request = require('request');
 var url = require('url');
 
-
-var options = {
+var host = 'localhost';
+var options = { //for github api
   clientID: '7d71da50c080b8899fa5',
   secret: '30221ba2c9d3ca955b0d7aa64ff57776dad801a1',
   scope: '',
-  redirectURI: 'http://localhost:8080/callback'
+  redirectURI: 'http://'+host+':8080/callback', //make sure this is the same as the callback URI in github
+  
 };
 
 
 var token = '';
-var state = Math.round(Math.random()*10);
+var state = Math.round(Math.random()*10); //not crypto secure; just a model for a stronger encryption option
 
 //dispatcher routes
 dispatcher.setStatic('resources');
 
 //main page
 dispatcher.onGet("/", function(req, res) {
-  var data = "<html><body><a href='login'>Login to App</a></body></html>";
+  var data = "<!DOCTYPE html><html><body><a href='login'>Login to App</a></body></html>";
   res.write(data);
   res.end();
 });
@@ -67,28 +68,27 @@ dispatcher.onGet("/callback", function(req, res) {
 
 //members page
 dispatcher.onGet("/dashboard", function(req, res) {
+  printWelcome(res);
+
+});
+
+
+//print welcome statement
+function printWelcome(res) {
   request.get({url: "https://api.github.com/user", headers: {'Authorization': 'token '+token, 'User-Agent': 'Mozilla 5.0'}}, function(error, response, body) {
     if (!error && response.statusCode == 200) {
       body = JSON.parse(body);
       var user = body.login;
-      var data = "<!DOCTYPE html><html><body><h1>Dashboard</h1>Welcome to your dashboard, "+user+"!</body></html>";
-      res.write(data);
-      res.end();
+      printStatement(user, res);
     } else {
       console.log(body);
     }
   });
-});
-
-
-//get authenticated user's username
-function getUsername(token) {
-  console.log(token);
-  request.get({url: 'https://api.github.com/user', headers: {'Authorization': 'token '+token}}, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      console.log(token);
-    }
-  });
+  
+  function printStatement(name, res) {
+    res.write("<!DOCTYPE html><html><body><h1>Dashboard</h1>Welcome to your dashboard, "+name+"!</body></html>");
+    res.end();
+  }
 }
 
 //define port for listening for web server
@@ -111,5 +111,5 @@ var server = http.createServer(handleRequest);
 
 //start the server on the port
 server.listen(PORT, function () {
-  console.log("Server listening on: http://localhost:%s", PORT);
+  console.log("Server listening on: http://"+host+":%s", PORT);
 });
