@@ -3,7 +3,7 @@ var http = require('http');
 var dispatcher = require('httpdispatcher');
 
 
-var state = round(Math.random()*10);
+var state = Math.round(Math.random()*10);
 
 var options = {
   clientID: '7d71da50c080b8899fa5',
@@ -27,10 +27,13 @@ dispatcher.onGet("/login", function(req, res) {
   res.end();
 });    
 
-dispatcher.onPost("/callback", function(req, res) {
+dispatcher.onGet("/callback", function(req, res) {
+  var url = require('url');
+  var url_parts = url.parse(req.url, true);
+  var query = url_parts.query;
   if(state) { //supposed to be if states match
     res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end(req);
+    res.end(query);
   }
   else {
     res.end('Sorry, an error occured.');
