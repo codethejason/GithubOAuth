@@ -6,8 +6,8 @@ var url = require('url');
 
 var host = 'localhost';
 var options = { //for github api
-  clientID: '7d71da50c080b8899fa5',
-  secret: '30221ba2c9d3ca955b0d7aa64ff57776dad801a1',
+  clientID: '',
+  secret: '',
   scope: '',
   redirectURI: 'http://'+host+':8080/callback', //make sure this is the same as the callback URI in github
   
