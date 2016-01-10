@@ -2,6 +2,11 @@
 var http = require('http');
 var dispatcher = require('httpdispatcher');
 
+
+var array = new Uint32Array(10);
+window.crypto.getRandomValues(array);
+var state = array[parseInt(Math.random()*10)];
+
 var options = {
   clientID: '7d71da50c080b8899fa5',
   scope: '',
@@ -13,7 +18,6 @@ dispatcher.setStatic('resources');
 
 //login page 
 dispatcher.onGet("/login", function(req, res) {
-  var state = 'hello';
   var url = 'https://github.com/login/oauth/authorize'
   + '?client_id=' + options.clientID
   + (options.scope ? '&scope=' + options.scope : '')
@@ -25,8 +29,13 @@ dispatcher.onGet("/login", function(req, res) {
   res.end()
 });    
 
-dispatcher.onGet("/callback", function(req, res) {
-  res.end('hello, this is a callback');
+dispatcher.onPost("/callback", function(req, res) {
+  if()
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.end(req);
+  else {
+    res.end('Sorry, an error occured.');
+  }
 });
 
 //define port for listening for web server
