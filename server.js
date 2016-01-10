@@ -46,8 +46,7 @@ dispatcher.onGet("/callback", function(req, res) {
   if(query.state == state) { //supposed to be if states match
     res.writeHead(200, {'Content-Type': 'text/plain'});
     token = requestToken(query.code);
-    console.log(token);
-    if(token) { 
+    if(true) { 
       console.log("H");
       var username = getUsername(token);
     };
@@ -60,19 +59,20 @@ dispatcher.onGet("/callback", function(req, res) {
 });
 
                  
-function requestToken(code) {
+function requestToken(code, callback) {
   var fetchedToken = '';
   var arguments = {
     code: code,
     client_id: options.clientID,
     client_secret: options.secret
   };
-  request.post({url: 'https://github.com/login/oauth/access_token', formData: arguments, headers: {'Accept': 'application/json'}}, function (error, response, body) {
+  if(request.post({url: 'https://github.com/login/oauth/access_token', formData: arguments, headers: {'Accept': 'application/json'}}, function (error, response, body) {
     if (!error && response.statusCode == 200) {
-      token = JSON.parse(body).access_token;
+      fetchedToken = JSON.parse(body).access_token;
     }
-  });
-  console.log("Token" + token);
+  })) {
+    callback(fetchedToken);
+  }
 };
 
 //get authenticated user's username
