@@ -6,8 +6,8 @@ var url = require('url');
 
 var host = 'localhost';
 var options = { //for github api
-  clientID: '',
-  secret: '',
+  clientID: '7d71da50c080b8899fa5',
+  secret: '30221ba2c9d3ca955b0d7aa64ff57776dad801a1',
   scope: '',
   redirectURI: 'http://'+host+':8080/callback', //make sure this is the same as the callback URI in github
   
@@ -53,7 +53,7 @@ dispatcher.onGet("/callback", function(req, res) {
       if (!error && response.statusCode == 200) {
         var token = JSON.parse(body).access_token;
         res.statusCode = 302;
-        printWelcome(res, token);
+        welcome(res, token);
       }
     });
     
@@ -64,19 +64,57 @@ dispatcher.onGet("/callback", function(req, res) {
 });
 
 //print welcome statement
-function printWelcome(res, token) {
-  request.get({url: "https://api.github.com/user", headers: {'Authorization': 'token '+token, 'User-Agent': 'Mozilla 5.0'}}, function(error, response, body) {
+function welcome(res, token) {
+  request.get({url: "https://api.github.com/user", headers: {'Authorization': 'token '+token, 'User-Agent': 'Mozilla/5.0'}}, function(error, response, body) {
     if (!error && response.statusCode == 200) {
       body = JSON.parse(body);
       var user = body.login;
-      printStatement(user, res);
+      checkMembership(user, token, res);
     } else {
       console.log(body);
     }
   });
   
-  function printStatement(name, res) {
-    res.write("<!DOCTYPE html><html><body><h1>Dashboard</h1>Welcome to your dashboard, "+name+"!</body></html>");
+  
+function checkMembership(user, token, res) {
+  var checking = {
+  teamID: 1163900, //GCI Students Team for Fossasia
+  user: user
+  };
+
+//options for the https request
+  var options = {
+    url: 'https://api.github.com/teams/'+checking.teamID+'/memberships/'+checking.user,
+    headers: {
+      'Authorization': 'token '+token,
+      'User-Agent': 'Mozilla/5.0'
+    }
+  };
+  request.get(options, function(error, response, body) {
+    var active;
+    if (!error && response.statusCode == 200) {
+      body = JSON.parse(body);
+      console.log(body);
+      if(body.state == "active") { 
+          active = true;
+      } else {
+        active = false;
+      }
+      printStatement(user, active, res);
+    } else {
+      console.log(body);
+      res.end("You don't have permission to check for team membership.");
+    }
+  });
+  
+}
+  
+  function printStatement(name, isActive, res) {
+    if(isActive) {
+      res.write("<!DOCTYPE html><html><body><h1>Dashboard</h1>Welcome to your dashboard, "+name+"! You are part of the FOSSASIA GCI Student Team.</body></html>");
+    } else {
+      res.write("<!DOCTYPE html><html><body><h1>Dashboard</h1>Welcome to your dashboard, "+name+"! You are not part of the FOSSASIA GCI Student Team.</body></html>");
+    }
     res.end();
   }
 }
@@ -95,6 +133,7 @@ function handleRequest (request, response) {
     console.log(err);
   }
 }
+
 
 //create a server
 var server = http.createServer(handleRequest);
