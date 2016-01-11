@@ -15,9 +15,6 @@ var options = { //for github api
 
 var state = Math.round(Math.random()*10); //not crypto secure; just a model for a stronger encryption option
 
-//dispatcher routes
-dispatcher.setStatic('resources');
-
 //main page
 dispatcher.onGet("/", function(req, res) {
   var data = "<!DOCTYPE html><html><body><a href='login'>Login to App</a></body></html>";
