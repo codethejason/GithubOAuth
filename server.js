@@ -13,7 +13,6 @@ var options = { //for github api
   
 };
 
-var token = '';
 var state = Math.round(Math.random()*10); //not crypto secure; just a model for a stronger encryption option
 
 //dispatcher routes
@@ -52,10 +51,9 @@ dispatcher.onGet("/callback", function(req, res) {
     };
     request.post({url: 'https://github.com/login/oauth/access_token', formData: arguments, headers: {'Accept': 'application/json'}}, function (error, response, body) {
       if (!error && response.statusCode == 200) {
-        token = JSON.parse(body).access_token;
+        var token = JSON.parse(body).access_token;
         res.statusCode = 302;
-        res.setHeader('location', 'dashboard');
-        res.end();
+        printWelcome(res, token);
       }
     });
     
@@ -65,15 +63,8 @@ dispatcher.onGet("/callback", function(req, res) {
   }
 });
 
-//members page
-dispatcher.onGet("/dashboard", function(req, res) {
-  printWelcome(res);
-
-});
-
-
 //print welcome statement
-function printWelcome(res) {
+function printWelcome(res, token) {
   request.get({url: "https://api.github.com/user", headers: {'Authorization': 'token '+token, 'User-Agent': 'Mozilla 5.0'}}, function(error, response, body) {
     if (!error && response.statusCode == 200) {
       body = JSON.parse(body);
