@@ -3,17 +3,19 @@ var http = require('http');
 var dispatcher = require('httpdispatcher');
 var request = require('request');
 var url = require('url');
+var config = require('./config.js');
+var uuid = require('node-uuid');
 
 var host = 'localhost';
 var options = { //for github api
-  clientID: '',
-  secret: '',
+  clientID: config.client_id,
+  secret: config.secret,
   scope: '',
   redirectURI: 'http://'+host+':8080/callback', //make sure this is the same as the callback URI in github
   
 };
 
-var state = Math.round(Math.random()*10); //not crypto secure; just a model for a stronger encryption option
+var state = uuid.v4(); //Random string
 
 //main page
 dispatcher.onGet("/", function(req, res) {
