@@ -3,6 +3,7 @@
   "description": "NodeJS app for authenticating into Github.",
   "dependencies": {
     "httpdispatcher": "*",
-    "request": "*"
+    "request": "*",
+    "node-uuid": "*"
   }
 }
