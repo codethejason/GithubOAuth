@@ -1,6 +1,6 @@
 //import modules
 var http = require('http');
-var dispatcher = require('httpdispatcher');
+var HttpDispatcher = require('httpdispatcher');
 var request = require('request');
 var url = require('url');
 var config = require('./config.js');
@@ -16,6 +16,7 @@ var options = { //for github api
 };
 
 var state = uuid.v4(); //Random string
+var dispatcher = new HttpDispatcher();
 
 //main page
 dispatcher.onGet("/", function(req, res) {
